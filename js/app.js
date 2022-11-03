@@ -2,10 +2,11 @@
 
 //Define each cookie shop as an object literal (I hate all the copy/paste here...I know constructors are coming)
 const seattle = {
+  location : 'Seattle',
   minHourlyCustomers: 23,
   maxHourlyCustomers: 65,
   avgCookiesPerSale: 6.3,
-  //This function returns a random integer between min and max (inclusive)
+  //This method returns a random integer between min and max (inclusive)
   generateHourlyCustomers() {
     const min = this.minHourlyCustomers;
     const max = this.maxHourlyCustomers;
@@ -18,12 +19,12 @@ const seattle = {
   //Adding functionality to change the opening and closing time, which feeds into the getDailyCookieSales method
   openingTime: '06:00',
   closingTime: '20:00',
-  //This function converts a 24 hour format string to an iterable and operatable number
+  //This method converts a 24 hour format string to an iterable and operatable number
   hourAsNumber(hourAsString) {
     const timeArr = hourAsString.split(':');
     return Number(timeArr[0]) + timeArr[1] / 60;
   },
-  //This function returns the current 12 hour format time
+  //This method returns the current 12 hour format time
   getCurrentHour(currentHourAsNumber) {
     const hours = Math.floor(currentHourAsNumber) % 12 || 12;
     let minutes = Math.round((currentHourAsNumber % 1) * 60);
@@ -49,7 +50,30 @@ const seattle = {
       dailySalesInfo.push([currentTime, currentCookieSales]);
     }
     return dailySalesInfo;
+  },
+  createDailySalesList() {
+    //Define indices where sales data is found
+    const HOUR = 0;
+    const COOKIES = 1;
+    const location = this.location;
+    //Create an h2 heading
+    const newH2 = document.createElement('h2');
+    newH2.innerText = location;
+    //Create an unordered list and iterate through the salesInfo array to create list items
+    const newUl = document.createElement('ul');
+    //Use canonical HTML styling (all lowercase for ids)
+    newUl.id = location[0].toLowerCase() + location.slice(1);
+    const salesInfo = this.getDailyCookieSales();
+    for (let i = 0; i < salesInfo.length; i++) {
+      let hour = salesInfo[i][HOUR];
+      let cookies = salesInfo[i][COOKIES];
+      let newLi = document.createElement('li');
+      newLi.innerText = `${hour}: ${cookies} cookies`;
+      newUl.appendChild(newLi);
+    }
+    newH2.appendChild(newUl);
+    document.body.appendChild(newH2);
   }
 };
 
-console.log(seattle.getDailyCookieSales());
+seattle.createDailySalesList();
