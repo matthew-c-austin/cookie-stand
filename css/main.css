@@ -2,17 +2,105 @@
 /* Table of Content
 ==================================================
 	- Google fonts & font family -
-	- typography -
-	- General -
-    - Preloader -
-	- Header -
-    - home section -
-    - About section -
-    - experience section -
-    - projects section -
-    - Contact section -
-    - Responsive media queries -
+	- Typography -
+    - Color Palette -
+    - General -
 */
 
-/* General
+/* Google fonts & font family
 ==================================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap');
+
+/*
+font-family: 'Roboto Condensed', sans-serif;
+font-family: Verdana, sans-serif;
+font-family: Georgia, serif;
+*/
+
+/* Typography
+==================================================*/
+
+h1, h2, h3, h4, h5, h6 {font-family:'Roboto Condensed', sans-serif;}
+
+html {
+    font-size:16px;
+}
+
+body {
+    font-family: Georgia, serif;
+    font-size: 1rem;
+}
+
+h1 {
+    font-size: 4rem;
+}
+
+h2 {
+    font-size: 3rem;
+}
+
+ul {
+    font-family: Verdana, sans-serif;
+    font-size: 1.5rem;
+}
+
+
+/* Color Palette;
+==================================================*/
+
+/* CSS - Cascading Style Sheet */
+/* Palette color codes */
+/* Palette URL: http://paletton.com/#uid=2350i0kbKcK81kZadhuhVc9mHb0 */
+
+/* As hex codes */
+
+/*
+.color-primary-0 { color: #2B453B }	 Main Primary color 
+.color-primary-1 { color: #557166 }
+.color-primary-2 { color: #405E53 }
+.color-primary-3 { color: #1D4134 }
+.color-primary-4 { color: #113B2B }
+
+.color-complement-0 { color: #664C40 }	Main Complement color 
+.color-complement-1 { color: #A78A7D }
+.color-complement-2 { color: #8B6D5F }
+.color-complement-3 { color: #613B2B }
+.color-complement-4 { color: #582D1A }
+*/
+
+h1, h2, h3, h4, h5, h6 {color: #a78a7d;}
+
+body {
+    background: #202020;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+ul {
+    background-color: #557166;
+}
+
+/* General;
+==================================================*/
+
+h1 {
+    margin-bottom: 5rem;
+    text-align: center;
+}
+
+h2 {
+    margin: auto;
+    text-align: left;
+    width: 50%;
+}
+
+ul {
+    margin: auto;
+    margin-bottom: 5rem;
+    text-align: left;
+    width: 50%;
+}
+
+li {
+    margin: 0.625rem;
+}

@@ -51,6 +51,14 @@ const seattle = {
     }
     return dailySalesInfo;
   },
+  totalDailyCookies(dailySalesInfo) {
+    const COOKIES = 1;
+    let totalCookies = 0;
+    for (let i = 0; i < dailySalesInfo.length; i++) {
+      totalCookies += dailySalesInfo[i][COOKIES];
+    }
+    return totalCookies;
+  },
   createDailySalesList() {
     //Define indices where sales data is found
     const HOUR = 0;
@@ -71,8 +79,14 @@ const seattle = {
       newLi.innerText = `${hour}: ${cookies} cookies`;
       newUl.appendChild(newLi);
     }
-    newH2.appendChild(newUl);
+    //Create a list item for the total number of cookies
+    let totalCookies = this.totalDailyCookies(salesInfo);
+    let newLi = document.createElement('li');
+    newLi.innerText = `Total: ${totalCookies} cookies`;
+    newUl.appendChild(newLi);
+    //Append h2 and ul to body
     document.body.appendChild(newH2);
+    document.body.appendChild(newUl);
   },
 };
 
@@ -126,6 +140,14 @@ const tokyo = {
     }
     return dailySalesInfo;
   },
+  totalDailyCookies(dailySalesInfo) {
+    const COOKIES = 1;
+    let totalCookies = 0;
+    for (let i = 0; i < dailySalesInfo.length; i++) {
+      totalCookies += dailySalesInfo[i][COOKIES];
+    }
+    return totalCookies;
+  },
   createDailySalesList() {
     //Define indices where sales data is found
     const HOUR = 0;
@@ -146,8 +168,14 @@ const tokyo = {
       newLi.innerText = `${hour}: ${cookies} cookies`;
       newUl.appendChild(newLi);
     }
-    newH2.appendChild(newUl);
+    //Create a list item for the total number of cookies
+    let totalCookies = this.totalDailyCookies(salesInfo);
+    let newLi = document.createElement('li');
+    newLi.innerText = `Total: ${totalCookies} cookies`;
+    newUl.appendChild(newLi);
+    //Append h2 and ul to body
     document.body.appendChild(newH2);
+    document.body.appendChild(newUl);
   },
 };
 
@@ -201,6 +229,14 @@ const dubai = {
     }
     return dailySalesInfo;
   },
+  totalDailyCookies(dailySalesInfo) {
+    const COOKIES = 1;
+    let totalCookies = 0;
+    for (let i = 0; i < dailySalesInfo.length; i++) {
+      totalCookies += dailySalesInfo[i][COOKIES];
+    }
+    return totalCookies;
+  },
   createDailySalesList() {
     //Define indices where sales data is found
     const HOUR = 0;
@@ -221,8 +257,14 @@ const dubai = {
       newLi.innerText = `${hour}: ${cookies} cookies`;
       newUl.appendChild(newLi);
     }
-    newH2.appendChild(newUl);
+    //Create a list item for the total number of cookies
+    let totalCookies = this.totalDailyCookies(salesInfo);
+    let newLi = document.createElement('li');
+    newLi.innerText = `Total: ${totalCookies} cookies`;
+    newUl.appendChild(newLi);
+    //Append h2 and ul to body
     document.body.appendChild(newH2);
+    document.body.appendChild(newUl);
   },
 };
 
@@ -276,6 +318,14 @@ const paris = {
     }
     return dailySalesInfo;
   },
+  totalDailyCookies(dailySalesInfo) {
+    const COOKIES = 1;
+    let totalCookies = 0;
+    for (let i = 0; i < dailySalesInfo.length; i++) {
+      totalCookies += dailySalesInfo[i][COOKIES];
+    }
+    return totalCookies;
+  },
   createDailySalesList() {
     //Define indices where sales data is found
     const HOUR = 0;
@@ -296,8 +346,14 @@ const paris = {
       newLi.innerText = `${hour}: ${cookies} cookies`;
       newUl.appendChild(newLi);
     }
-    newH2.appendChild(newUl);
+    //Create a list item for the total number of cookies
+    let totalCookies = this.totalDailyCookies(salesInfo);
+    let newLi = document.createElement('li');
+    newLi.innerText = `Total: ${totalCookies} cookies`;
+    newUl.appendChild(newLi);
+    //Append h2 and ul to body
     document.body.appendChild(newH2);
+    document.body.appendChild(newUl);
   },
 };
 
@@ -351,6 +407,14 @@ const lima = {
     }
     return dailySalesInfo;
   },
+  totalDailyCookies(dailySalesInfo) {
+    const COOKIES = 1;
+    let totalCookies = 0;
+    for (let i = 0; i < dailySalesInfo.length; i++) {
+      totalCookies += dailySalesInfo[i][COOKIES];
+    }
+    return totalCookies;
+  },
   createDailySalesList() {
     //Define indices where sales data is found
     const HOUR = 0;
@@ -371,8 +435,14 @@ const lima = {
       newLi.innerText = `${hour}: ${cookies} cookies`;
       newUl.appendChild(newLi);
     }
-    newH2.appendChild(newUl);
+    //Create a list item for the total number of cookies
+    let totalCookies = this.totalDailyCookies(salesInfo);
+    let newLi = document.createElement('li');
+    newLi.innerText = `Total: ${totalCookies} cookies`;
+    newUl.appendChild(newLi);
+    //Append h2 and ul to body
     document.body.appendChild(newH2);
+    document.body.appendChild(newUl);
   },
 };
 
