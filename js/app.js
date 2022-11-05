@@ -1,7 +1,8 @@
 'use strict';
-//Assume that all stores open and close at the same time
+//Assume that all stores open and close at the same time. Maybe functionality can be added later to make this variable, so keep it as an object property for now. Functions in this script are only valid for this assumption
 const OPENS = '06:00';
 const CLOSES = '20:00';
+
 //Define all stores info for CookieStand construction
 const seattle = {
   location: 'Seattle',
@@ -60,11 +61,13 @@ CookieStand.prototype.generateHourlyCustomers = function() {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+//This method generates the number cookies sold per hour
 CookieStand.prototype.generateHourlyCookies = function() {
   const avg = this.avgCookiesPerSale;
   return Math.round(avg * this.generateHourlyCustomers());
 };
 
+//This method creates an array with hourly cookie sales
 CookieStand.prototype.getDailyCookieSales = function() {
   const openingTimeAsNumber = hourAsNumber(this.openingTime);
   const ClosingTimeAsNumber = hourAsNumber(this.closingTime);
@@ -80,6 +83,7 @@ CookieStand.prototype.getDailyCookieSales = function() {
   }
 };
 
+//This method calculates the total number of cookies sold that day
 CookieStand.prototype.totalDailyCookies = function() {
   const COOKIES = 1;
   let totalCookies = 0;
@@ -89,6 +93,7 @@ CookieStand.prototype.totalDailyCookies = function() {
   return totalCookies;
 };
 
+//This method calls the getDailyCookieSales method, as well as creating a table row with sales data
 CookieStand.prototype.createDailySalesList = function() {
   //Define index where sales data is found
   const COOKIES = 1;
@@ -128,27 +133,39 @@ function getCurrentHour(currentHourAsNumber) {
   let minutes = Math.round((currentHourAsNumber % 1) * 60);
   //If minutes is in the single digits, format with a leading 0
   minutes = minutes < 10 ? '0' + minutes : minutes;
-  const period = currentHourAsNumber < 12 ? 'AM' : 'PM';
+  const period = currentHourAsNumber < 12 ? 'am' : 'pm';
 
-  return `${hours}:${minutes} ${period}`;
+  return `${hours}:${minutes}${period}`;
 }
 
 //Overall function to generate the daily sales data
 function generateDailySalesTable() {
   //Define the time information to be used in the subsequent functions
-  const openingTimeAsNumber = hourAsNumber(openingTime);
-  const ClosingTimeAsNumber = hourAsNumber(closingTime);
+  const openingTimeAsNumber = hourAsNumber(OPENS);
+  const ClosingTimeAsNumber = hourAsNumber(CLOSES);
   const totalOperatingHours = ClosingTimeAsNumber - openingTimeAsNumber;
-
+  let totalHourlyCookies = [];
+  let totalDailyCookies = 0;
   //For speed, create a fragment instead of a new table so that you only have one reflow and a single render.
   const fragment = document.createDocumentFragment();
   fragment.appendChild(createDailySalesTableHead(openingTimeAsNumber, totalOperatingHours));
   //Create new CookieStands and rows for the sales table
+  let tbody = document.createElement('tbody');
   for (let store in stores) {
+    //Define index where sales data is found
+    const COOKIES = 1;
     const newStand = new CookieStand(store['location'], store['minHourlyCustomers'], store['maxHourlyCustomers'], store['avgCookiesPerSale'], OPENS, CLOSES);
-    fragment.appendChild(newStand.createDailySalesList());
+    tbody.appendChild(newStand.createDailySalesList());
+    //Increment totalHourlyCookies for each new store location. This functionality is only valid for the condition that all stores open and close at the same time.
+    for (let i = 0; i < newStand.dailySalesInfo.length; i++) {
+      totalHourlyCookies[i] += newStand.dailySalesInfo[i][COOKIES];
+      totalDailyCookies += newStand.totalDailyCookies();
+    }
+    //Add the overall total cookies to the totalHourlyCookies array (i.e., the table foot row)
+    totalHourlyCookies.push(totalDailyCookies);
   }
-  fragment.appendChild(createDailySalesTableFoot(openingTimeAsNumber, totalOperatingHours));
+  fragment.appendChild(tbody);
+  fragment.appendChild(createDailySalesTableFoot(totalHourlyCookies));
   document.body.appendChild(fragment);
 }
 
@@ -156,25 +173,38 @@ function generateDailySalesTable() {
 function createDailySalesTableHead(openTime, totalHours) {
   const thead = document.createElement('thead');
   const tr = document.createElement('tr');
+  //According to the requirements, the first header in the table is empty
+  let th = document.createElement('th');
+  th.innerText = '';
+  tr.appendChild(th);
   //Create table headers at one hour intervals
   for (let i = 0; i < totalHours; i++) {
     let currentTime = getCurrentHour(openTime + i);
-    let th = document.createElement('th');
+    th = document.createElement('th');
     th.innerText = currentTime;
     tr.appendChild(th);
   }
+  //Create a final Daily Location Total header
+  th = document.createElement('th');
+  th.innerText = 'Daily Location Total';
+  tr.appendChild(th);
   thead.appendChild(tr);
   return thead;
 }
 
 //Create Table Foot
-function createDailySalesTableFoot(openTime, totalHours) {
+function createDailySalesTableFoot(totalCookiesArray) {
   const tfoot = document.createElement('tfoot');
   const tr = document.createElement('tr');
-  //Naively assume that there is a 1-1 relationship between number of rows and hours. Know that the first cell in the head is empty
-  const numberOfRows = fragment.rows[]
-  fragment.numberOfRows
-  return tfoot
+  let td = document.createElement('td');
+  td.innerText = 'Totals';
+  tr.appendChild(td);
+  for (let cookies in totalCookiesArray) {
+    td = document.createElement('td');
+    td.innerText = cookies;
+    tr.appendChild(td);
+  }
+  return tfoot;
 }
 
 generateDailySalesTable();
