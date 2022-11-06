@@ -1,4 +1,5 @@
 'use strict';
+
 //Assume that all stores open and close at the same time. Maybe functionality can be added later to make this variable, so keep it as an object property for now. Functions in this script are only valid for this assumption
 const OPENS = '06:00';
 const CLOSES = '20:00';
@@ -19,7 +20,7 @@ const tokyo = {
 const dubai = {
   location: 'Dubai',
   minHourlyCustomers: 11,
-  maxHourlyCustomers: 6538,
+  maxHourlyCustomers: 38,
   avgCookiesPerSale: 3.7,
 };
 const paris = {
@@ -144,26 +145,27 @@ function generateDailySalesTable() {
   const openingTimeAsNumber = hourAsNumber(OPENS);
   const ClosingTimeAsNumber = hourAsNumber(CLOSES);
   const totalOperatingHours = ClosingTimeAsNumber - openingTimeAsNumber;
-  let totalHourlyCookies = [];
+  //Initialize an array to calculate the overall total hourly cookies sold
+  let totalHourlyCookies = new Array(totalOperatingHours).fill(0);
   let totalDailyCookies = 0;
   //For speed, create a fragment instead of a new table so that you only have one reflow and a single render.
   const fragment = document.createDocumentFragment();
   fragment.appendChild(createDailySalesTableHead(openingTimeAsNumber, totalOperatingHours));
-  //Create new CookieStands and rows for the sales table
+  //Create new CookieStands and rows for the sales table body
   let tbody = document.createElement('tbody');
-  for (let store in stores) {
+  for (let store of stores) {
     //Define index where sales data is found
     const COOKIES = 1;
-    const newStand = new CookieStand(store['location'], store['minHourlyCustomers'], store['maxHourlyCustomers'], store['avgCookiesPerSale'], OPENS, CLOSES);
+    const newStand = new CookieStand(store.location, store.minHourlyCustomers, store.maxHourlyCustomers, store.avgCookiesPerSale, OPENS, CLOSES);
     tbody.appendChild(newStand.createDailySalesList());
     //Increment totalHourlyCookies for each new store location. This functionality is only valid for the condition that all stores open and close at the same time.
     for (let i = 0; i < newStand.dailySalesInfo.length; i++) {
       totalHourlyCookies[i] += newStand.dailySalesInfo[i][COOKIES];
-      totalDailyCookies += newStand.totalDailyCookies();
     }
-    //Add the overall total cookies to the totalHourlyCookies array (i.e., the table foot row)
-    totalHourlyCookies.push(totalDailyCookies);
+    totalDailyCookies += newStand.totalDailyCookies();
   }
+  //Add the overall total cookies to the totalHourlyCookies array (i.e., the table foot row)
+  totalHourlyCookies.push(totalDailyCookies);
   fragment.appendChild(tbody);
   fragment.appendChild(createDailySalesTableFoot(totalHourlyCookies));
   document.body.appendChild(fragment);
@@ -199,11 +201,12 @@ function createDailySalesTableFoot(totalCookiesArray) {
   let td = document.createElement('td');
   td.innerText = 'Totals';
   tr.appendChild(td);
-  for (let cookies in totalCookiesArray) {
+  for (let cookies of totalCookiesArray) {
     td = document.createElement('td');
     td.innerText = cookies;
     tr.appendChild(td);
   }
+  tfoot.appendChild(tr);
   return tfoot;
 }
 
