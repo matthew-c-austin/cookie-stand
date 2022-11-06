@@ -150,7 +150,8 @@ function generateDailySalesTable() {
   let totalDailyCookies = 0;
   //For speed, create a fragment instead of a new table so that you only have one reflow and a single render.
   const fragment = document.createDocumentFragment();
-  fragment.appendChild(createDailySalesTableHead(openingTimeAsNumber, totalOperatingHours));
+  let newTable = document.createElement('table');
+  newTable.appendChild(createDailySalesTableHead(openingTimeAsNumber, totalOperatingHours));
   //Create new CookieStands and rows for the sales table body
   let tbody = document.createElement('tbody');
   for (let store of stores) {
@@ -166,9 +167,11 @@ function generateDailySalesTable() {
   }
   //Add the overall total cookies to the totalHourlyCookies array (i.e., the table foot row)
   totalHourlyCookies.push(totalDailyCookies);
-  fragment.appendChild(tbody);
-  fragment.appendChild(createDailySalesTableFoot(totalHourlyCookies));
-  document.body.appendChild(fragment);
+  newTable.appendChild(tbody);
+  newTable.appendChild(createDailySalesTableFoot(totalHourlyCookies));
+  fragment.appendChild(newTable);
+  let salesInfo = document.getElementById('salesInfo');
+  salesInfo.parentElement.insertBefore(fragment, salesInfo.nextElementSibling);
 }
 
 //Create Table Headers
@@ -198,11 +201,11 @@ function createDailySalesTableHead(openTime, totalHours) {
 function createDailySalesTableFoot(totalCookiesArray) {
   const tfoot = document.createElement('tfoot');
   const tr = document.createElement('tr');
-  let td = document.createElement('td');
-  td.innerText = 'Totals';
-  tr.appendChild(td);
+  let th = document.createElement('th');
+  th.innerText = 'Totals';
+  tr.appendChild(th);
   for (let cookies of totalCookiesArray) {
-    td = document.createElement('td');
+    let td = document.createElement('td');
     td.innerText = cookies;
     tr.appendChild(td);
   }

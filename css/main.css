@@ -77,11 +77,29 @@ body {
 }
 
 ul {
-    background-color: #557166;
+    background: #557166;
+}
+
+thead, tfoot {
+    background: #613B2B;
+}
+
+
+
+tbody tr:nth-child(even) {
+    background: #1D4134;
+}
+
+tbody tr:nth-child(odd) {
+    background: #557166;
 }
 
 /* General;
 ==================================================*/
+
+.h-64 {
+    height: 4rem;
+}
 
 h1 {
     margin-bottom: 5rem;
@@ -89,9 +107,8 @@ h1 {
 }
 
 h2 {
-    margin: auto;
     text-align: left;
-    width: 50%;
+    margin-bottom: 1rem;
 }
 
 ul {
@@ -104,3 +121,37 @@ ul {
 li {
     margin: 0.625rem;
 }
+
+thead th {
+    text-align: center;
+    vertical-align: bottom;
+}
+
+tbody th {
+    text-align: right;
+}
+ 
+th, td {
+    border: 1px solid;
+}
+
+th, td {
+    padding: 0.5rem;
+}
+
+td {
+    text-align: center;
+}
+
+thead th:first-child {
+    background: #202020;
+    border: none;
+}
+
+table:hover td {
+    opacity: 25%;
+  }
+  
+  table:hover tr:hover td {
+    opacity: 100%;
+  }
