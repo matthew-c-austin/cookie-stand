@@ -5,9 +5,9 @@ const OPENS = '06:00';
 const CLOSES = '20:00';
 
 //Define the control curve for projected sales traffic for each hour open
-const projectedSalesFactor = [0.5, 0.75, 1.0, 0.6, 0.8, 1.0, 0.7, 0.4, 0.6, 0.9, 0.7, 0.5, 0.3, 0.4, 0.6];
+const PROJECTED_SALES_CURVE = [0.5, 0.75, 1.0, 0.6, 0.8, 1.0, 0.7, 0.4, 0.6, 0.9, 0.7, 0.5, 0.3, 0.4, 0.6];
 
-//Define all stores info for CookieStand construction
+//Define all stores info for CookieStand construction. A stretch goal would be to have a separate text file or page with these as JSON to read in sort of like an API call.
 const seattle = {
   location: 'Seattle',
   minHourlyCustomers: 23,
@@ -71,28 +71,28 @@ CookieStand.prototype.generateHourlyCookies = function(numberOfCustomers) {
   return Math.round(avg * numberOfCustomers);
 };
 
-//This method creates an array with hourly cookie sales and prejected staffing required based on the constant projected sales control curve
+//This method populates the dailySalesInfo array property with hourly cookie sales and projected staffing required based on the constant projected sales control curve
 CookieStand.prototype.getDailyCookieSales = function() {
-  const openingTimeAsNumber = hourAsNumber(this.openingTime);
-  const ClosingTimeAsNumber = hourAsNumber(this.closingTime);
+  const openingTimeAsNumber = getHourAsNumber(this.openingTime);
+  const ClosingTimeAsNumber = getHourAsNumber(this.closingTime);
   const totalOperatingHours = ClosingTimeAsNumber - openingTimeAsNumber;
   //Iterate hourly to populate the daily sales information
   for (let i = 0; i < totalOperatingHours; i++) {
-    //If the shop is open for less than an hour until close, factor the cookies sold
+    //If the shop is open for less than an hour until close, factor the cookies sold. This functionality isn't entirely necessary for the limitations of the current code base, but I'm keeping it for future refactoring
     let timeRemainder = totalOperatingHours - i;
     let remainderFactor = timeRemainder < 1 ? timeRemainder : 1;
     let currentTime = getCurrentHour(openingTimeAsNumber + i);
     let hourlyCustomers = this.generateHourlyCustomers();
-    let currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * projectedSalesFactor[i]);
+    let currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
     //Calculate required tossers using the basic rubric that a single Salmon Cookie Tosser can serve 20 customers per hour, and that each location should have a minimum of two Salmon Cookie Tossers on shift at all times
-    let tossersNeeded = Math.round(hourlyCustomers / 20);
+    let tossersNeeded = Math.ceiling(hourlyCustomers / 20);
     tossersNeeded = tossersNeeded < 2 ? 2 : tossersNeeded;
     this.dailySalesInfo.push([currentTime, currentCookieSales, tossersNeeded]);
   }
 };
 
 //This method calculates the total number of cookies sold that day or the total number of employees needed
-CookieStand.prototype.totalDailyInfo = function(salesInfoIndex) {
+CookieStand.prototype.getTotalDailyInfo = function(salesInfoIndex) {
   let total = 0;
   for (let i = 0; i < this.dailySalesInfo.length; i++) {
     total += this.dailySalesInfo[i][salesInfoIndex];
@@ -118,17 +118,17 @@ CookieStand.prototype.renderSalesDataRow = function(salesInfoIndex, hasDailyTota
     td.innerText = salesInfo[i][salesInfoIndex];
     tr.appendChild(td);
   }
-  if (hasDailyTotal === true) {
+  if (hasDailyTotal) {
     //Create a table data element for the total
     let td = document.createElement('td');
-    td.innerText = this.totalDailyInfo(salesInfoIndex);
+    td.innerText = this.getTotalDailyInfo(salesInfoIndex);
     tr.appendChild(td);
   }
   return tr;
 };
 
 //This function converts a 24 hour format string to an iterable and operatable number
-function hourAsNumber(hourAsString) {
+function getHourAsNumber(hourAsString) {
   const timeArr = hourAsString.split(':');
   return Number(timeArr[0]) + Number(timeArr[1]) / 60;
 }
@@ -147,33 +147,33 @@ function getCurrentHour(currentHourAsNumber) {
 //Overall function to generate the daily sales data tables
 function generateDailySalesTables() {
   //Define the time information to be used in the subsequent functions
-  const openingTimeAsNumber = hourAsNumber(OPENS);
-  const ClosingTimeAsNumber = hourAsNumber(CLOSES);
+  const openingTimeAsNumber = getHourAsNumber(OPENS);
+  const ClosingTimeAsNumber = getHourAsNumber(CLOSES);
   const totalOperatingHours = ClosingTimeAsNumber - openingTimeAsNumber;
   //Initialize an array to calculate the overall total hourly cookies sold
   let totalHourlyCookies = new Array(totalOperatingHours).fill(0);
   let totalDailyCookies = 0;
   //Initialize an array to calculate the overall total employees needed
   let totalHourlyTossers = new Array(totalOperatingHours).fill(0);
-  //For the sales data table there is a daily total, for the tossers there is not
+  //For the sales data table there is a daily total; for the tossers there is not
   let salesTable = createNewTable(openingTimeAsNumber, totalOperatingHours, true);
   let tossersTable = createNewTable(openingTimeAsNumber, totalOperatingHours, false);
   //Iterate over every store and create a CookieStand. Track the hourly and daily sales info and create new table rows.
   for (let store of stores) {
-    //Define index where cookie sales and tosser data is found
-    const COOKIES = 1;
-    const TOSSERS = 2;
     //Create new CookieStand and render table row
     const newStand = new CookieStand(store.location, store.minHourlyCustomers, store.maxHourlyCustomers, store.avgCookiesPerSale, OPENS, CLOSES);
     newStand.getDailyCookieSales();
-    salesTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(COOKIES, true));
-    tossersTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(TOSSERS, false));
+    //Define index where cookie sales and tosser data is found
+    const cookies_idx = 1;
+    const tossers_idx = 2;
+    salesTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(cookies_idx, true));
+    tossersTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(tossers_idx, false));
     //Increment totalHourlyCookies and totalHourlyTossers for each new store location. This functionality is only valid for the condition that all stores open and close at the same time.
     for (let i = 0; i < newStand.dailySalesInfo.length; i++) {
-      totalHourlyCookies[i] += newStand.dailySalesInfo[i][COOKIES];
-      totalHourlyTossers[i] += newStand.dailySalesInfo[i][TOSSERS];
+      totalHourlyCookies[i] += newStand.dailySalesInfo[i][cookies_idx];
+      totalHourlyTossers[i] += newStand.dailySalesInfo[i][tossers_idx];
     }
-    totalDailyCookies += newStand.totalDailyInfo(COOKIES);
+    totalDailyCookies += newStand.getTotalDailyInfo(cookies_idx);
   }
   //Add the overall total cookies to the totalHourlyCookies array (i.e., the table foot row)
   totalHourlyCookies.push(totalDailyCookies);
@@ -215,7 +215,7 @@ function createDailySalesTableHead(openTime, totalHours, hasDailyTotalColumn) {
     th.innerText = currentTime;
     tr.appendChild(th);
   }
-  if (hasDailyTotalColumn === true) {
+  if (hasDailyTotalColumn) {
     //Create a final Daily Location Total header
     th = document.createElement('th');
     th.innerText = 'Daily Location Total';
@@ -226,13 +226,13 @@ function createDailySalesTableHead(openTime, totalHours, hasDailyTotalColumn) {
 }
 
 //Create Table Foot
-function createDailySalesTableFoot(totalCookiesArray) {
+function createDailySalesTableFoot(totalsArray) {
   const tfoot = document.createElement('tfoot');
   const tr = document.createElement('tr');
   let th = document.createElement('th');
   th.innerText = 'Totals';
   tr.appendChild(th);
-  for (let cookies of totalCookiesArray) {
+  for (let cookies of totalsArray) {
     let td = document.createElement('td');
     td.innerText = cookies;
     tr.appendChild(td);
