@@ -5,6 +5,9 @@
 	- Typography -
     - Color Palette -
     - General -
+    - Nav Bar -
+    - Products -
+    - Footer -
 */
 
 /* Google fonts & font family
@@ -40,12 +43,9 @@ h2 {
     font-size: 3rem;
 }
 
-ul {
-    font-family: Verdana, sans-serif;
+.products a{
     font-size: 1.5rem;
 }
-
-
 /* Color Palette;
 ==================================================*/
 
@@ -69,33 +69,17 @@ ul {
 .color-complement-4 { color: #582D1A }
 */
 
+/* General;
+==================================================*/
+
 h1, h2, h3, h4, h5, h6 {color: #a78a7d;}
 
 body {
+    display: flex;
+    flex-direction: column;
     background: #202020;
     color: rgba(255, 255, 255, 0.9);
 }
-
-ul {
-    background: #557166;
-}
-
-thead, tfoot {
-    background: #613B2B;
-}
-
-
-
-tbody tr:nth-child(even) {
-    background: #1D4134;
-}
-
-tbody tr:nth-child(odd) {
-    background: #557166;
-}
-
-/* General;
-==================================================*/
 
 .h-64 {
     height: 4rem;
@@ -111,17 +95,32 @@ h2 {
     margin-bottom: 1rem;
 }
 
-ul {
-    margin: auto;
-    margin-bottom: 5rem;
-    text-align: left;
-    width: 50%;
+a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
 }
 
-li {
-    margin: 0.625rem;
+a:hover {
+    color: white;
+    transition: 0.3s;
 }
 
+b {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+thead, tfoot {
+    background: #613B2B;
+}
+
+tbody tr:nth-child(even) {
+    background: #1D4134;
+}
+
+tbody tr:nth-child(odd) {
+    background: #557166;
+}
 
 thead th {
     text-align: center;
@@ -157,3 +156,65 @@ table:hover td {
   table:hover tr:hover td {
     opacity: 100%;
   }
+
+/* Nav Bar;
+==================================================*/
+
+header {
+    display: flex;
+    width: 100%;
+    background: #613B2B;
+}
+
+nav {
+    display: flex;
+}
+
+.logo {
+    max-width: 10rem;
+}
+
+.mixlinks {
+   display: flex;
+}
+
+/* Products;
+==================================================*/
+
+.products {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.products a{
+    color: #a78a7d;
+    
+}
+
+.products a:hover {
+    color: rgb(249, 239, 233);
+    transition: 0.3s;
+}
+
+.products-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5rem;
+}
+
+/* Footer;
+==================================================*/
+
+footer {
+    display: flex;
+    width: 100%;
+    background: #613B2B;
+    justify-content: space-evenly;
+    padding: 0.5rem 0 0.5rem 0;
+}
+
+footer p {
+    color: rgba(255, 255, 255, 0.7);
+}
