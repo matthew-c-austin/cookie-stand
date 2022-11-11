@@ -118,6 +118,9 @@ b {
     text-transform: uppercase;
 }
 
+table {
+    width: 100%;
+}
 thead, tfoot {
     background: #613B2B;
 }
@@ -163,6 +166,10 @@ table:hover td {
   
   table:hover tr:hover td {
     opacity: 100%;
+  }
+
+  table {
+    table-layout: auto;
   }
 
 /* Nav Bar;
@@ -250,7 +257,7 @@ nav a{
 /* Family;
 ==================================================*/
 
-.family {
+.family{
     display: flex;
     flex-direction: column;
     align-items: center;
