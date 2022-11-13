@@ -7,6 +7,11 @@ const CLOSES = '20:00';
 // Define the control curve for projected sales traffic for each hour open
 const PROJECTED_SALES_CURVE = [0.5, 0.75, 1.0, 0.6, 0.8, 1.0, 0.7, 0.4, 0.6, 0.9, 0.7, 0.5, 0.3, 0.4, 0.6];
 
+// Initialize the totals arrays
+let totalHourlyCookies = [];
+let totalHourlyTossers = [];
+let totalDailyCookies = 0;
+
 // Define all stores info for CookieStand construction. A stretch goal would be to have a separate text file or page with these as JSON to read in sort of like an API call.
 const seattle = {
   location: 'Seattle',
@@ -127,6 +132,28 @@ CookieStand.prototype.renderSalesDataRow = function(salesInfoIndex, hasDailyTota
   return tr;
 };
 
+// This method finds the table row that matches the current cookie stand and decrements the totals array, then replaces the table data
+CookieStand.prototype.replaceSalesDataRow = function(tableBody, totalHourlyArray, salesInfoIndex, hasDailyTotal) {
+  let location_id = this.location;
+  let tr = tableBody.getElementById(location_id);
+  let tdArray = tr.querySelectorAll('td');
+  console.log(tdArray);
+  const salesInfo = this.dailySalesInfo;
+  for (let i = 0; i < salesInfo.length; i++) {
+    let td = tdArray[i].innerText;
+    totalHourlyArray[i] -= td;
+    td = salesInfo[i][salesInfoIndex];
+    totalHourlyArray[i] += td;
+  }
+
+  if (hasDailyTotal) {
+    //Update the final index of the table row and totalHourlyArray
+    let td = tdArray[tdArray.length].innerText;
+    totalHourlyArray[totalHourlyArray.length] -= td;
+    td = this.getTotalDailyInfo(salesInfoIndex);
+    totalHourlyArray[totalHourlyArray.length] += td;
+  }
+};
 // This function converts a 24 hour format string to an iterable and operatable number
 function getHourAsNumber(hourAsString) {
   const timeArr = hourAsString.split(':');
@@ -151,10 +178,9 @@ function generateDailySalesTables() {
   const ClosingTimeAsNumber = getHourAsNumber(CLOSES);
   const totalOperatingHours = ClosingTimeAsNumber - openingTimeAsNumber;
   // Initialize an array to calculate the overall total hourly cookies sold
-  let totalHourlyCookies = new Array(totalOperatingHours).fill(0);
-  let totalDailyCookies = 0;
+  totalHourlyCookies = Array(totalOperatingHours).fill(0);
   // Initialize an array to calculate the overall total employees needed
-  let totalHourlyTossers = new Array(totalOperatingHours).fill(0);
+  totalHourlyTossers = Array(totalOperatingHours).fill(0);
   // For the sales data table there is a daily total; for the tossers there is not
   let salesTable = createNewTable('salesTable',openingTimeAsNumber, totalOperatingHours, true);
   let tossersTable = createNewTable('tossersTable', openingTimeAsNumber, totalOperatingHours, false);
@@ -242,7 +268,6 @@ function createDailySalesTableFoot(totalsArray) {
   return tfoot;
 }
 
-generateDailySalesTables();
 
 // Add event listener for sales form submittal
 let salesForm = document.getElementById('salesForm');
@@ -255,16 +280,51 @@ function addCookieStand(event) {
   let maxHourlyCustomers = form.maxHourlyCustomers.value;
   let avgCookiesPerSale = form.avgCookiesPerSale.value;
   const newStand = new CookieStand(location, minHourlyCustomers, maxHourlyCustomers, avgCookiesPerSale, OPENS, CLOSES);
-  console.log(newStand);
   newStand.getDailyCookieSales();
   // Define index where cookie sales and tosser data is found
   const cookies_idx = 1;
   const tossers_idx = 2;
+  // Define html elements to
   let salesTable = document.getElementById('salesTable');
-  salesTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(cookies_idx, true));
+  let salesTableBody = salesTable.querySelector('tbody');
   let tossersTable = document.getElementById('tossersTable');
-  tossersTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(tossers_idx, false));
+  let tossersTableBody = tossersTable.querySelector('tbody');
+  //Check if the location added is a new location and update the totals
+  if (isNewCookieStand()) {
+    updateTableBodies(true);
+  } else {
+    updateTableBodies(false);
+  }
+
+  function isNewCookieStand() {
+    let thArray = salesTableBody.getElementsByTagName('th');
+    for (let i in thArray) {
+      // Check for table body row headers case insensitively
+      if (thArray[i].innerText.toLowerCase() === location.toLowerCase()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // This function either adds the new location or updates an old location
+  function updateTableBodies(isNewStand) {
+    if (isNewStand) {
+      salesTableBody.appendChild(newStand.renderSalesDataRow(cookies_idx, true));
+      tossersTableBody.appendChild(newStand.renderSalesDataRow(tossers_idx, false));
+      for (let i = 0; i < newStand.dailySalesInfo.length; i++) {
+        totalHourlyCookies[i] += newStand.dailySalesInfo[i][cookies_idx];
+        totalHourlyTossers[i] += newStand.dailySalesInfo[i][tossers_idx];
+      }
+      totalDailyCookies += newStand.getTotalDailyInfo(cookies_idx);
+      //Update the final index of the totalHourlyCookies Array
+      totalHourlyCookies[totalHourlyCookies.length] = totalDailyCookies;
+    } else {
+      newStand.replaceSalesDataRow(salesTableBody, totalHourlyCookies, cookies_idx, true);
+      newStand.replaceSalesDataRow(tossersTableBody, totalHourlyTossers, tossers_idx, false);
+    }
+  }
   form.reset();
 }
 
-
+generateDailySalesTables();
