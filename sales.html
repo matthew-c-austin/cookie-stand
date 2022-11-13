@@ -31,26 +31,25 @@
 <body>
   <h1>Daily Sales Information</h1>
   <h2 id="salesFormHeader">Sales Form</h2>
-  <form>
+  <form class="salesForm">
     <fieldset>
-      <legend>New Location</legend>
-      <label>
+      <label for="location">
         Location
-        <input type="text" name="newLocation" id="newLocation" required>
+        <input type="text" name="newLocation" id="newLocation" required >
       </label>
-      <label>
+      <label for="min-hourly-customers">
         Minimum Hourly Customers
         <input type="number" name="minHourlyCustomers" id="minHourlyCustomers" min="0" step="1" required>
       </label>
-      <label>
+      <label for="max-hourly-customers">
         Maximum Hourly Customers
         <input type="number" name="maxHourlyCustomers" id="maxHourlyCustomers" min="0" step="1" required>
       </label>
-      <label>
+      <label for="avg-cookies">
         Average Cookies per Sale
         <input type="number" name="avgCookiesPerSale" id="avgCookiesPerSale" min="0" step="0.1" required>
       </label>
-      <label>
+      <label id = "submit" for="submit">
         <input type="submit" name="submitButton" id="submitButton">
       </label>
     </fieldset>
