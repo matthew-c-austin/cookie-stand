@@ -10,7 +10,6 @@ const PROJECTED_SALES_CURVE = [0.5, 0.75, 1.0, 0.6, 0.8, 1.0, 0.7, 0.4, 0.6, 0.9
 // Initialize the totals arrays
 let totalHourlyCookies = [];
 let totalHourlyTossers = [];
-let totalDailyCookies = 0;
 
 // Define all stores info for CookieStand construction. A stretch goal would be to have a separate text file or page with these as JSON to read in sort of like an API call.
 const seattle = {
@@ -106,16 +105,14 @@ CookieStand.prototype.getTotalDailyInfo = function(salesInfoIndex) {
 };
 
 // This method renders a table row for the desired sales data (cookies or employees)
-CookieStand.prototype.renderSalesDataRow = function(salesInfoIndex, hasDailyTotal) {
-  // Define index where sales data is found
-  const location = this.location;
+CookieStand.prototype.renderSalesDataRow = function(tableID, salesInfoIndex, hasDailyTotal) {
   // Create a new table row
   const tr = document.createElement('tr');
-  // Use canonical HTML styling (all lowercase for ids)
-  tr.id = location[0].toLowerCase() + location.slice(1);
+  // Define table row ID
+  tr.id = this.generateTableRowID(tableID);
   // Create a table header element
   const th = document.createElement('th');
-  th.innerText = location;
+  th.innerText = this.location;
   tr.appendChild(th);
   const salesInfo = this.dailySalesInfo;
   for (let i = 0; i < salesInfo.length; i++) {
@@ -132,28 +129,35 @@ CookieStand.prototype.renderSalesDataRow = function(salesInfoIndex, hasDailyTota
   return tr;
 };
 
-// This method finds the table row that matches the current cookie stand and decrements the totals array, then replaces the table data
-CookieStand.prototype.replaceSalesDataRow = function(tableBody, totalHourlyArray, salesInfoIndex, hasDailyTotal) {
-  let location_id = this.location;
-  let tr = tableBody.getElementById(location_id);
+// This method generates a unique HTML tag ID for each table row
+CookieStand.prototype.generateTableRowID = function (tableID) {
+  return `${tableID}-${this.location.toLowerCase()}`;
+};
+
+// This method finds the table row that matches the current cookie stand and decrements the totals array, then replaces the table data, then increments the totals array.
+CookieStand.prototype.replaceSalesDataRow = function(tableID, totalHourlyArray, salesInfoIndex, hasDailyTotal) {
+  let trID = this.generateTableRowID(tableID);
+  let tr = document.getElementById(trID);
   let tdArray = tr.querySelectorAll('td');
-  console.log(tdArray);
   const salesInfo = this.dailySalesInfo;
   for (let i = 0; i < salesInfo.length; i++) {
-    let td = tdArray[i].innerText;
-    totalHourlyArray[i] -= td;
-    td = salesInfo[i][salesInfoIndex];
-    totalHourlyArray[i] += td;
+    let tdBefore = Number(tdArray[i].innerText);
+    totalHourlyArray[i] -= tdBefore;
+    tdArray[i].innerText = salesInfo[i][salesInfoIndex];
+    let tdAfter = Number(tdArray[i].innerText);
+    totalHourlyArray[i] += tdAfter;
   }
 
   if (hasDailyTotal) {
     //Update the final index of the table row and totalHourlyArray
-    let td = tdArray[tdArray.length].innerText;
-    totalHourlyArray[totalHourlyArray.length] -= td;
-    td = this.getTotalDailyInfo(salesInfoIndex);
-    totalHourlyArray[totalHourlyArray.length] += td;
+    let tdBefore = Number(tdArray[tdArray.length - 1].innerText);
+    totalHourlyArray[totalHourlyArray.length - 1] -= tdBefore;
+    tdArray[tdArray.length - 1].innerText = this.getTotalDailyInfo(salesInfoIndex);
+    let tdAfter = Number(tdArray[tdArray.length - 1].innerText);
+    totalHourlyArray[totalHourlyArray.length - 1] += tdAfter;
   }
 };
+
 // This function converts a 24 hour format string to an iterable and operatable number
 function getHourAsNumber(hourAsString) {
   const timeArr = hourAsString.split(':');
@@ -177,13 +181,16 @@ function generateDailySalesTables() {
   const openingTimeAsNumber = getHourAsNumber(OPENS);
   const ClosingTimeAsNumber = getHourAsNumber(CLOSES);
   const totalOperatingHours = ClosingTimeAsNumber - openingTimeAsNumber;
-  // Initialize an array to calculate the overall total hourly cookies sold
+  //   // Set the size of the totalHourlyCookies array to calculate the overall total hourly cookies sold
   totalHourlyCookies = Array(totalOperatingHours).fill(0);
-  // Initialize an array to calculate the overall total employees needed
+  //   // Set the size of the totalHourlyTossers array to calculate the overall total employees needed array to calculate the overall total employees needed
   totalHourlyTossers = Array(totalOperatingHours).fill(0);
+  let totalDailyCookies = 0;
   // For the sales data table there is a daily total; for the tossers there is not
-  let salesTable = createNewTable('salesTable',openingTimeAsNumber, totalOperatingHours, true);
-  let tossersTable = createNewTable('tossersTable', openingTimeAsNumber, totalOperatingHours, false);
+  const salesTableID = 'salesTable';
+  let salesTable = createNewTable(salesTableID,openingTimeAsNumber, totalOperatingHours, true);
+  const tossersTableID = 'tossersTable';
+  let tossersTable = createNewTable(tossersTableID, openingTimeAsNumber, totalOperatingHours, false);
   // Iterate over every store and create a CookieStand. Track the hourly and daily sales info and create new table rows.
   for (let store of stores) {
     // Create new CookieStand and render table row
@@ -192,8 +199,8 @@ function generateDailySalesTables() {
     // Define index where cookie sales and tosser data is found
     const cookies_idx = 1;
     const tossers_idx = 2;
-    salesTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(cookies_idx, true));
-    tossersTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(tossers_idx, false));
+    salesTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(salesTableID, cookies_idx, true));
+    tossersTable.querySelector('tbody').appendChild(newStand.renderSalesDataRow(tossersTableID, tossers_idx, false));
     // Increment totalHourlyCookies and totalHourlyTossers for each new store location. This functionality is only valid for the condition that all stores open and close at the same time.
     for (let i = 0; i < newStand.dailySalesInfo.length; i++) {
       totalHourlyCookies[i] += newStand.dailySalesInfo[i][cookies_idx];
@@ -284,10 +291,12 @@ function addCookieStand(event) {
   // Define index where cookie sales and tosser data is found
   const cookies_idx = 1;
   const tossers_idx = 2;
-  // Define html elements to
-  let salesTable = document.getElementById('salesTable');
+  // Define html elements to replace or append
+  const salesTableID = 'salesTable';
+  let salesTable = document.getElementById(salesTableID);
   let salesTableBody = salesTable.querySelector('tbody');
-  let tossersTable = document.getElementById('tossersTable');
+  const tossersTableID = 'tossersTable';
+  let tossersTable = document.getElementById(tossersTableID);
   let tossersTableBody = tossersTable.querySelector('tbody');
   //Check if the location added is a new location and update the totals
   if (isNewCookieStand()) {
@@ -295,12 +304,16 @@ function addCookieStand(event) {
   } else {
     updateTableBodies(false);
   }
+  updateTableFooter(salesTable, totalHourlyCookies);
+  updateTableFooter(tossersTable, totalHourlyTossers);
 
+  // This function checks if the HTML tag for the sales table row is used in the table header.
   function isNewCookieStand() {
-    let thArray = salesTableBody.getElementsByTagName('th');
-    for (let i in thArray) {
+    const trArray = salesTableBody.getElementsByTagName('tr');
+    const tableRowID = newStand.generateTableRowID(salesTableID);
+    for (let i in trArray) {
       // Check for table body row headers case insensitively
-      if (thArray[i].innerText.toLowerCase() === location.toLowerCase()) {
+      if (trArray[i].id === tableRowID) {
         return false;
       }
     }
@@ -310,20 +323,29 @@ function addCookieStand(event) {
   // This function either adds the new location or updates an old location
   function updateTableBodies(isNewStand) {
     if (isNewStand) {
-      salesTableBody.appendChild(newStand.renderSalesDataRow(cookies_idx, true));
-      tossersTableBody.appendChild(newStand.renderSalesDataRow(tossers_idx, false));
+      salesTableBody.appendChild(newStand.renderSalesDataRow(salesTableID, cookies_idx, true));
+      tossersTableBody.appendChild(newStand.renderSalesDataRow(tossersTableID, tossers_idx, false));
       for (let i = 0; i < newStand.dailySalesInfo.length; i++) {
         totalHourlyCookies[i] += newStand.dailySalesInfo[i][cookies_idx];
         totalHourlyTossers[i] += newStand.dailySalesInfo[i][tossers_idx];
       }
-      totalDailyCookies += newStand.getTotalDailyInfo(cookies_idx);
       //Update the final index of the totalHourlyCookies Array
-      totalHourlyCookies[totalHourlyCookies.length] = totalDailyCookies;
+      totalHourlyCookies[totalHourlyCookies.length - 1] += newStand.getTotalDailyInfo(cookies_idx);
     } else {
-      newStand.replaceSalesDataRow(salesTableBody, totalHourlyCookies, cookies_idx, true);
-      newStand.replaceSalesDataRow(tossersTableBody, totalHourlyTossers, tossers_idx, false);
+      newStand.replaceSalesDataRow(salesTableID, totalHourlyCookies, cookies_idx, true);
+      newStand.replaceSalesDataRow(tossersTableID, totalHourlyTossers, tossers_idx, false);
     }
   }
+
+  // This function updates the values in the table footer
+  function updateTableFooter(table, totalsArray) {
+    let tfoot = table.querySelector('tfoot');
+    let tdArray = tfoot.querySelectorAll('td');
+    for (let i = 0; i < totalsArray.length; i++) {
+      tdArray[i].innerText = totalsArray[i];
+    }
+  }
+
   form.reset();
 }
 
