@@ -83,11 +83,11 @@ CookieStand.prototype.getDailyCookieSales = function() {
   // Iterate hourly to populate the daily sales information
   for (let i = 0; i < totalOperatingHours; i++) {
     // If the shop is open for less than an hour until close, factor the cookies sold. This functionality isn't entirely necessary for the limitations of the current code base, but I'm keeping it for future refactoring
-    let timeRemainder = totalOperatingHours - i;
-    let remainderFactor = timeRemainder < 1 ? timeRemainder : 1;
-    let currentTime = getCurrentHour(openingTimeAsNumber + i);
-    let hourlyCustomers = this.generateHourlyCustomers();
-    let currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
+    const timeRemainder = totalOperatingHours - i;
+    const remainderFactor = timeRemainder < 1 ? timeRemainder : 1;
+    const currentTime = getCurrentHour(openingTimeAsNumber + i);
+    const hourlyCustomers = this.generateHourlyCustomers();
+    const currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
     // Calculate required tossers using the basic rubric that a single Salmon Cookie Tosser can serve 20 customers per hour, and that each location should have a minimum of two Salmon Cookie Tossers on shift at all times
     let tossersNeeded = Math.ceil(hourlyCustomers / 20);
     tossersNeeded = tossersNeeded < 2 ? 2 : tossersNeeded;
@@ -122,7 +122,7 @@ CookieStand.prototype.renderSalesDataRow = function(tableID, salesInfoIndex, has
   }
   if (hasDailyTotal) {
     // Create a table data element for the total
-    let td = document.createElement('td');
+    const td = document.createElement('td');
     td.innerText = this.getTotalDailyInfo(salesInfoIndex);
     tr.appendChild(td);
   }
@@ -136,24 +136,24 @@ CookieStand.prototype.generateTableRowID = function (tableID) {
 
 // This method finds the table row that matches the current cookie stand and decrements the totals array, then replaces the table data, then increments the totals array.
 CookieStand.prototype.replaceSalesDataRow = function(tableID, totalHourlyArray, salesInfoIndex, hasDailyTotal) {
-  let trID = this.generateTableRowID(tableID);
-  let tr = document.getElementById(trID);
-  let tdArray = tr.querySelectorAll('td');
+  const trID = this.generateTableRowID(tableID);
+  const tr = document.getElementById(trID);
+  const tdArray = tr.querySelectorAll('td');
   const salesInfo = this.dailySalesInfo;
   for (let i = 0; i < salesInfo.length; i++) {
-    let tdBefore = Number(tdArray[i].innerText);
+    const tdBefore = Number(tdArray[i].innerText);
     totalHourlyArray[i] -= tdBefore;
     tdArray[i].innerText = salesInfo[i][salesInfoIndex];
-    let tdAfter = Number(tdArray[i].innerText);
+    const tdAfter = Number(tdArray[i].innerText);
     totalHourlyArray[i] += tdAfter;
   }
 
   if (hasDailyTotal) {
     //Update the final index of the table row and totalHourlyArray
-    let tdBefore = Number(tdArray[tdArray.length - 1].innerText);
+    const tdBefore = Number(tdArray[tdArray.length - 1].innerText);
     totalHourlyArray[totalHourlyArray.length - 1] -= tdBefore;
     tdArray[tdArray.length - 1].innerText = this.getTotalDailyInfo(salesInfoIndex);
-    let tdAfter = Number(tdArray[tdArray.length - 1].innerText);
+    const tdAfter = Number(tdArray[tdArray.length - 1].innerText);
     totalHourlyArray[totalHourlyArray.length - 1] += tdAfter;
   }
 };
@@ -188,9 +188,9 @@ function generateDailySalesTables() {
   let totalDailyCookies = 0;
   // For the sales data table there is a daily total; for the tossers there is not
   const salesTableID = 'salesTable';
-  let salesTable = createNewTable(salesTableID,openingTimeAsNumber, totalOperatingHours, true);
+  const salesTable = createNewTable(salesTableID,openingTimeAsNumber, totalOperatingHours, true);
   const tossersTableID = 'tossersTable';
-  let tossersTable = createNewTable(tossersTableID, openingTimeAsNumber, totalOperatingHours, false);
+  const tossersTable = createNewTable(tossersTableID, openingTimeAsNumber, totalOperatingHours, false);
   // Iterate over every store and create a CookieStand. Track the hourly and daily sales info and create new table rows.
   for (let store of stores) {
     // Create new CookieStand and render table row
@@ -214,8 +214,8 @@ function generateDailySalesTables() {
   //Create and append the footer and append the table after the correct header
   salesTable.querySelector('table').appendChild(createDailySalesTableFoot(totalHourlyCookies));
   tossersTable.querySelector('table').appendChild(createDailySalesTableFoot(totalHourlyTossers));
-  let salesInfo = document.getElementById('salesInfo');
-  let tossersInfo = document.getElementById('tossersInfo');
+  const salesInfo = document.getElementById('salesInfo');
+  const tossersInfo = document.getElementById('tossersInfo');
   salesInfo.parentElement.insertBefore(salesTable, salesInfo.nextElementSibling);
   tossersInfo.parentElement.insertBefore(tossersTable, tossersInfo.nextElementSibling);
 }
@@ -224,11 +224,11 @@ function generateDailySalesTables() {
 function createNewTable(tableID, openTime, totalHours, hasDailyTotalColumn) {
   // For speed, create new fragment instead of a new table so that you only have one reflow and a single render.
   const fragment = document.createDocumentFragment();
-  let newTable = document.createElement('table');
+  const newTable = document.createElement('table');
   newTable.id = tableID;
   newTable.appendChild(createDailySalesTableHead(openTime, totalHours, hasDailyTotalColumn));
   // Create new CookieStands and rows for the sales table body
-  let tbody = document.createElement('tbody');
+  const tbody = document.createElement('tbody');
   newTable.appendChild(tbody);
   fragment.appendChild(newTable);
   return fragment;
@@ -263,7 +263,7 @@ function createDailySalesTableHead(openTime, totalHours, hasDailyTotalColumn) {
 function createDailySalesTableFoot(totalsArray) {
   const tfoot = document.createElement('tfoot');
   const tr = document.createElement('tr');
-  let th = document.createElement('th');
+  const th = document.createElement('th');
   th.innerText = 'Totals';
   tr.appendChild(th);
   for (let total of totalsArray) {
@@ -275,29 +275,45 @@ function createDailySalesTableFoot(totalsArray) {
   return tfoot;
 }
 
+// Add event listener for clicking sales form button for custom validity check on customer quantities. This happens before the submit() event.
+const submitButton = document.getElementById('submitButton');
+submitButton.addEventListener('click', checkCustomerValidity);
+function checkCustomerValidity() {
+  const minHourlyCustomers = document.getElementById('minHourlyCustomers');
+  const maxHourlyCustomers = document.getElementById('maxHourlyCustomers');
+  const minHourlyCustomersValue = minHourlyCustomers.value;
+  const maxHourlyCustomersValue = maxHourlyCustomers.value;
+  const isValid = maxHourlyCustomersValue >= minHourlyCustomersValue;
+  if (!isValid) {
+    minHourlyCustomers.setCustomValidity('Minimum hourly customers must be less than or equal to maximum hourly customers');
+    return;
+  } else {
+    minHourlyCustomers.setCustomValidity('');
+  }
+}
 
 // Add event listener for sales form submittal
-let salesForm = document.getElementById('salesForm');
+const salesForm = document.getElementById('salesForm');
 salesForm.addEventListener('submit', addCookieStand);
 function addCookieStand(event) {
   event.preventDefault();
-  let form = event.target;
-  let location = form.location.value;
-  let minHourlyCustomers = form.minHourlyCustomers.value;
-  let maxHourlyCustomers = form.maxHourlyCustomers.value;
-  let avgCookiesPerSale = form.avgCookiesPerSale.value;
-  const newStand = new CookieStand(location, minHourlyCustomers, maxHourlyCustomers, avgCookiesPerSale, OPENS, CLOSES);
+  const form = event.target;
+  const location = form.location.value;
+  const minHourlyCustomersValue = form.minHourlyCustomers.value;
+  const maxHourlyCustomersValue = form.maxHourlyCustomers.value;
+  const avgCookiesPerSale = form.avgCookiesPerSale.value;
+  const newStand = new CookieStand(location, minHourlyCustomersValue, maxHourlyCustomersValue, avgCookiesPerSale, OPENS, CLOSES);
   newStand.getDailyCookieSales();
   // Define index where cookie sales and tosser data is found
   const cookies_idx = 1;
   const tossers_idx = 2;
   // Define html elements to replace or append
   const salesTableID = 'salesTable';
-  let salesTable = document.getElementById(salesTableID);
-  let salesTableBody = salesTable.querySelector('tbody');
+  const salesTable = document.getElementById(salesTableID);
+  const salesTableBody = salesTable.querySelector('tbody');
   const tossersTableID = 'tossersTable';
-  let tossersTable = document.getElementById(tossersTableID);
-  let tossersTableBody = tossersTable.querySelector('tbody');
+  const tossersTable = document.getElementById(tossersTableID);
+  const tossersTableBody = tossersTable.querySelector('tbody');
   //Check if the location added is a new location and update the totals
   if (isNewCookieStand()) {
     updateTableBodies(true);
@@ -339,8 +355,8 @@ function addCookieStand(event) {
 
   // This function updates the values in the table footer
   function updateTableFooter(table, totalsArray) {
-    let tfoot = table.querySelector('tfoot');
-    let tdArray = tfoot.querySelectorAll('td');
+    const tfoot = table.querySelector('tfoot');
+    const tdArray = tfoot.querySelectorAll('td');
     for (let i = 0; i < totalsArray.length; i++) {
       tdArray[i].innerText = totalsArray[i];
     }
