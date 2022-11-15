@@ -83,11 +83,11 @@ CookieStand.prototype.getDailyCookieSales = function() {
   // Iterate hourly to populate the daily sales information
   for (let i = 0; i < totalOperatingHours; i++) {
     // If the shop is open for less than an hour until close, factor the cookies sold. This functionality isn't entirely necessary for the limitations of the current code base, but I'm keeping it for future refactoring
-    const timeRemainder = totalOperatingHours - i;
-    const remainderFactor = timeRemainder < 1 ? timeRemainder : 1;
-    const currentTime = getCurrentHour(openingTimeAsNumber + i);
-    const hourlyCustomers = this.generateHourlyCustomers();
-    const currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
+    let timeRemainder = totalOperatingHours - i;
+    let remainderFactor = timeRemainder < 1 ? timeRemainder : 1;
+    let currentTime = getCurrentHour(openingTimeAsNumber + i);
+    let hourlyCustomers = this.generateHourlyCustomers();
+    let currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
     // Calculate required tossers using the basic rubric that a single Salmon Cookie Tosser can serve 20 customers per hour, and that each location should have a minimum of two Salmon Cookie Tossers on shift at all times
     let tossersNeeded = Math.ceil(hourlyCustomers / 20);
     tossersNeeded = tossersNeeded < 2 ? 2 : tossersNeeded;
@@ -281,8 +281,8 @@ submitButton.addEventListener('click', checkCustomerValidity);
 function checkCustomerValidity() {
   const minHourlyCustomers = document.getElementById('minHourlyCustomers');
   const maxHourlyCustomers = document.getElementById('maxHourlyCustomers');
-  const minHourlyCustomersValue = minHourlyCustomers.value;
-  const maxHourlyCustomersValue = maxHourlyCustomers.value;
+  const minHourlyCustomersValue = Number(minHourlyCustomers.value);
+  const maxHourlyCustomersValue = Number(maxHourlyCustomers.value);
   const isValid = maxHourlyCustomersValue >= minHourlyCustomersValue;
   if (!isValid) {
     minHourlyCustomers.setCustomValidity('Minimum hourly customers must be less than or equal to maximum hourly customers');
@@ -299,8 +299,8 @@ function addCookieStand(event) {
   event.preventDefault();
   const form = event.target;
   const location = form.location.value;
-  const minHourlyCustomersValue = form.minHourlyCustomers.value;
-  const maxHourlyCustomersValue = form.maxHourlyCustomers.value;
+  const minHourlyCustomersValue = Number(form.minHourlyCustomers.value);
+  const maxHourlyCustomersValue = Number(form.maxHourlyCustomers.value);
   const avgCookiesPerSale = form.avgCookiesPerSale.value;
   const newStand = new CookieStand(location, minHourlyCustomersValue, maxHourlyCustomersValue, avgCookiesPerSale, OPENS, CLOSES);
   newStand.getDailyCookieSales();
