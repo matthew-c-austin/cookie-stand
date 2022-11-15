@@ -301,7 +301,7 @@ function addCookieStand(event) {
   const location = form.location.value;
   const minHourlyCustomersValue = Number(form.minHourlyCustomers.value);
   const maxHourlyCustomersValue = Number(form.maxHourlyCustomers.value);
-  const avgCookiesPerSale = form.avgCookiesPerSale.value;
+  const avgCookiesPerSale = Number(form.avgCookiesPerSale.value);
   const newStand = new CookieStand(location, minHourlyCustomersValue, maxHourlyCustomersValue, avgCookiesPerSale, OPENS, CLOSES);
   newStand.getDailyCookieSales();
   // Define index where cookie sales and tosser data is found
