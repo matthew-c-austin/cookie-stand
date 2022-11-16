@@ -87,7 +87,7 @@ CookieStand.prototype.getDailyCookieSales = function() {
     let remainderFactor = timeRemainder < 1 ? timeRemainder : 1;
     let currentTime = getCurrentHour(openingTimeAsNumber + i);
     let hourlyCustomers = this.generateHourlyCustomers();
-    let currentCookieSales = Math.round(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
+    let currentCookieSales = Math.ceil(this.generateHourlyCookies(hourlyCustomers) * remainderFactor * PROJECTED_SALES_CURVE[i]);
     // Calculate required tossers using the basic rubric that a single Salmon Cookie Tosser can serve 20 customers per hour, and that each location should have a minimum of two Salmon Cookie Tossers on shift at all times
     let tossersNeeded = Math.ceil(hourlyCustomers / 20);
     tossersNeeded = tossersNeeded < 2 ? 2 : tossersNeeded;
@@ -361,7 +361,6 @@ function addCookieStand(event) {
       tdArray[i].innerText = totalsArray[i];
     }
   }
-
   form.reset();
 }
 
